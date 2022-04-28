@@ -7,6 +7,7 @@ import {
 	where,
 	orderBy,
 	limit,
+	startAfter,
 } from 'firebase/firestore'
 import { db } from '../firebase.config.js'
 import { toast } from 'react-toastify'
@@ -14,6 +15,7 @@ import Spinner from '../components/Spinner/Spinner'
 import ListingItem from '../components/ListingItem/ListingItem.jsx'
 
 const Category = () => {
+	const [fetchLastListing, setFetchLastListing] = useState(null)
 	const [listings, setListings] = useState(null)
 	const [loading, setLoading] = useState(true)
 
@@ -35,6 +37,8 @@ const Category = () => {
 
 				// Execute query
 				const querySnap = await getDocs(q)
+				const lastVisible = querySnap.docs[querySnap.docs.length - 1]
+				setFetchLastListing(lastVisible)
 
 				const listings = []
 
@@ -52,6 +56,41 @@ const Category = () => {
 		}
 		fetchListings()
 	}, [params.categoryName])
+
+	//Pagination
+	const onFetchMoreListings = async () => {
+		try {
+			// Get reference
+			const listingsRef = collection(db, 'listings')
+
+			// Create a query
+			const q = query(
+				listingsRef,
+				where('type', '==', params.categoryName),
+				orderBy('timestamp', 'desc'),
+				startAfter(fetchLastListing),
+				limit(3)
+			)
+
+			// Execute query
+			const querySnap = await getDocs(q)
+			const lastVisible = querySnap.docs[querySnap.docs.length - 1]
+			setFetchLastListing(lastVisible)
+
+			const listings = []
+
+			querySnap.forEach(doc => {
+				return listings.push({
+					id: doc.id,
+					data: doc.data(),
+				})
+			})
+			setListings(prevState => [...prevState, ...listings])
+			setLoading(false)
+		} catch (error) {
+			toast.error('Could not fetch listings')
+		}
+	}
 	return (
 		<div className='category'>
 			<header>
@@ -77,6 +116,12 @@ const Category = () => {
 							))}
 						</ul>
 					</main>
+					{fetchLastListing && (
+						<p className='loadMore' onClick={onFetchMoreListings}>
+							Load More
+						</p>
+					)}
+					{/* <p className='loadMore'>ASDASD</p> */}
 				</>
 			) : (
 				<p>No listings for {params.categoryName}</p>

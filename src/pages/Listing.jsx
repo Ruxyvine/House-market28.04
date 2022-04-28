@@ -29,7 +29,6 @@ const Listing = () => {
 				setLoading(false)
 			}
 		}
-		console.log(listing)
 		fetchListing()
 	}, [navigate, params.listingId])
 
@@ -41,44 +40,17 @@ const Listing = () => {
 		<main>
 			{/* <Slider /> */}
 			<Swiper slidesPerView={1} pagination={{ clickable: true }}>
-				{/* {listing.imgUrls.map((url, index))} */}
-				<SwiperSlide>
-					<div
-						className='swiperSlideDiv'
-						style={{
-							background: `url(${listing.imgUrls[0]}) center no-repeat`,
-							backgroundSize: 'cover',
-						}}
-					></div>
-				</SwiperSlide>
-				<SwiperSlide>
-					<div
-						className='swiperSlideDiv'
-						style={{
-							background: `url(${listing.imgUrls[1]}) center no-repeat`,
-							backgroundSize: 'cover',
-						}}
-					></div>
-				</SwiperSlide>
-				<SwiperSlide>
-					<div
-						className='swiperSlideDiv'
-						style={{
-							background: `url(${listing.imgUrls[2]}) center no-repeat`,
-							backgroundSize: 'cover',
-						}}
-					></div>
-				</SwiperSlide>
-				<SwiperSlide>
-					<div
-						className='swiperSlideDiv'
-						style={{
-							background: `url(${listing.imgUrls[3]}) center no-repeat`,
-							backgroundSize: 'cover',
-						}}
-					></div>
-				</SwiperSlide>
-				))
+				{listing.imgUrls.map((url, index) => (
+					<SwiperSlide key={index}>
+						<div
+							style={{
+								background: `url(${listing.imgUrls[index]}) center no-repeat`,
+								backgroundSize: 'cover',
+							}}
+							className='swiperSlideDiv'
+						></div>
+					</SwiperSlide>
+				))}
 			</Swiper>
 
 			<div
